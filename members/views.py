@@ -40,3 +40,12 @@ def register_user(request):
         return JsonResponse({'user': username, 'email': email})
     else:
         return HttpResponse(status=404)
+
+@ensure_csrf_cookie
+def get_user_by_id(request):
+    if request.method == 'POST':
+        id = request.POST['id']
+        user = User.objects.get(id=id)
+        return JsonResponse({'username': user.username, 'email': user.email})
+    return HttpResponse(status=404)
+
