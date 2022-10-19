@@ -1,13 +1,14 @@
 from djongo import models
 from django.contrib.auth.models import User
-import datetime
+import uuid
 
 
 # Create your models here.
 class Recipe(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid1, editable=False)
     recipe_title = models.TextField(max_length=100)
     recipe_description = models.TextField(max_length=250)
-    pub_date = models.DateTimeField(datetime.datetime.now())
+    pub_date = models.DateTimeField(auto_now=True, blank=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
