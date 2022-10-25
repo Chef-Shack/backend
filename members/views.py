@@ -54,4 +54,13 @@ def get_user_by_id(request):
     return HttpResponse(status=404)
 
 
+@ensure_csrf_cookie
+def get_user_by_name(request, username):
+    user = User.objects.all().filter(username=username).first()
+    if user.is_superuser:
+        return JsonResponse({'username': user.username, 'email': user.email, 'isPremium': True})
+    userProperties = UserProperties.objects.get(pk=user)
+    return JsonResponse({'username': user.username, 'email': user.email, 'isPremium': userProperties.isPremium})
+
+
 
