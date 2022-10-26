@@ -63,4 +63,14 @@ def get_user_by_name(request, username):
     return JsonResponse({'username': user.username, 'email': user.email, 'isPremium': userProperties.isPremium})
 
 
+@ensure_csrf_cookie
+def get_user_instance(request):
+        try:
+            if request.user.is_superuser:
+                return JsonResponse({'username': request.user.username, 'email': request.user.email, 'isPremium': True})
+            userProperties = UserProperties.objects.get(pk=request.user)
+            return JsonResponse({'username': request.user.username, 'email': request.user.email, 'isPremium': userProperties.isPremium})
+        except Exception:
+            return JsonResponse({'username': request.user.username, 'isAuthenticated': request.user.is_authenticated})
+
 
