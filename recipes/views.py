@@ -18,9 +18,10 @@ def create_recipe(request):
                 'authorID': recipe.author.id,
                 'pub_date': recipe.pub_date,
                 'recipe_title': recipe.recipe_title,
-                'recipe_description': recipe.recipe_description
+                'recipe_description': recipe.recipe_description,
+                'success': True
             })
-    return HttpResponse(status=404)
+    return JsonResponse({'success': False})
 
 
 def get_recipe(request):
@@ -32,10 +33,10 @@ def get_recipe(request):
             'authorID': r.author.id,
             'pub_date': r.pub_date,
             'recipe_title': r.recipe_title,
-            'recipe_description': r.recipe_description
+            'recipe_description': r.recipe_description,
+            'success': True
         })
-    return HttpResponse(status=404)
-
+    return JsonResponse({'success': False})
 
 def update_recipe(request):
     if request.method == 'POST':
@@ -54,10 +55,11 @@ def update_recipe(request):
             'authorID': r.author.id,
             'pub_date': r.pub_date,
             'recipe_title': r.recipe_title,
-            'recipe_description': r.recipe_description
+            'recipe_description': r.recipe_description,
+            'success': True
         })
 
-    return JsonResponse({'hello': 'hi'})
+    return JsonResponse({'success': False})
 
 
 def delete_recipe(request):
@@ -67,9 +69,9 @@ def delete_recipe(request):
         if r.author_id == request.user.id or request.user.is_superuser:
             r.delete()
         else:
-            return HttpResponse(status=404)
-        return HttpResponse(status=200)
-    return HttpResponse(status=404)
+            return JsonResponse({'success': False})
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False})
 
 
 def authors_recipes(request):
@@ -83,8 +85,9 @@ def authors_recipes(request):
                 'authorID': recipe.author.id,
                 'pub_date': recipe.pub_date,
                 'recipe_title': recipe.recipe_title,
-                'recipe_description': recipe.recipe_description
+                'recipe_description': recipe.recipe_description,
+                'success': True
             }
             list_of_recipes.append(temp_dict)
         return JsonResponse(list_of_recipes, safe=False)
-    return HttpResponse(status=404)
+    return JsonResponse({'success': False})

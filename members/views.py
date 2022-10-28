@@ -16,17 +16,17 @@ def login_user(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return HttpResponse(status=200)
+            return JsonResponse({'user': username, 'password': password, 'success': True})
         else:
-            return HttpResponse(status=404)
+            return JsonResponse({'success': False})
     else:
-        return HttpResponse(status=404)
+        return JsonResponse({'success': False})
 
 
 @ensure_csrf_cookie
 def logout_user(request):
     logout(request)
-    return HttpResponse(status=200)
+    return JsonResponse({'success': True})
 
 
 @ensure_csrf_cookie
@@ -37,9 +37,9 @@ def register_user(request):
         email = request.POST['email']
         user = User.objects.create_user(username=username, password=password, email=email)
         userProperties = UserProperties.objects.create(user=user, isPremium=False)
-        return JsonResponse({'user': username, 'email': email, 'isPremium': userProperties.isPremium})
+        return JsonResponse({'user': username, 'email': email, 'isPremium': userProperties.isPremium, 'success': True})
     else:
-        return HttpResponse(status=404)
+        return JsonResponse({'success': False})
 
 
 @ensure_csrf_cookie
@@ -48,19 +48,24 @@ def get_user_by_id(request):
         id = request.POST['id']
         user = User.objects.get(pk=id)
         if user.is_superuser:
-            return JsonResponse({'username': user.username, 'email': user.email, 'isPremium': True})
+            return JsonResponse({'username': user.username, 'email': user.email, 'isPremium': True, 'success': True})
         userProperties = UserProperties.objects.get(pk=user)
-        return JsonResponse({'username': user.username, 'email': user.email, 'isPremium': userProperties.isPremium})
-    return HttpResponse(status=404)
+        return JsonResponse({'username': user.username, 'email': user.email, 'isPremium': userProperties.isPremium,
+                             'success': True})
+    return JsonResponse({'success': False})
 
 
 @ensure_csrf_cookie
 def get_user_by_name(request, username):
     user = User.objects.all().filter(username=username).first()
     if user.is_superuser:
-        return JsonResponse({'username': user.username, 'email': user.email, 'isPremium': True})
+        return JsonResponse({'username': user.username, 'email': user.email, 'isPremium': True, 'success': True})
     userProperties = UserProperties.objects.get(pk=user)
-    return JsonResponse({'username': user.username, 'email': user.email, 'isPremium': userProperties.isPremium})
+    try:
+        return JsonResponse({'username': user.username, 'email': user.email, 'isPremium': userProperties.isPremium,
+                             'success': True})
+    except Exception:
+        return JsonResponse({'success': False})
 
 
 @ensure_csrf_cookie
