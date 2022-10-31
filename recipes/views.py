@@ -2,6 +2,7 @@ from django.http import HttpResponse, JsonResponse
 from recipes.models import Recipe
 
 
+
 # Create your views here.
 # CRUD Create Read Update Write
 def create_recipe(request):
@@ -91,3 +92,17 @@ def authors_recipes(request):
             list_of_recipes.append(temp_dict)
         return JsonResponse(list_of_recipes, safe=False)
     return JsonResponse({'success': False})
+
+
+def get_all_recipes(request):
+    global data
+    recipes = []
+    for r in Recipe.objects.all():
+        recipes.append({
+            'id': r.id,
+            'authorID': r.author.id,
+            'pub_date': r.pub_date,
+            'recipe_title': r.recipe_title,
+            'recipe_description': r.recipe_description,
+        })
+    return JsonResponse({'recipes': recipes, 'success': True})

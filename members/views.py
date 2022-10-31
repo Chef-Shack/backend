@@ -5,7 +5,6 @@ from django.contrib.auth.models import User
 from members.models import UserProperties
 
 
-
 # Create your views here.
 
 @ensure_csrf_cookie
@@ -70,12 +69,11 @@ def get_user_by_name(request, username):
 
 @ensure_csrf_cookie
 def get_user_instance(request):
-        try:
-            if request.user.is_superuser:
-                return JsonResponse({'username': request.user.username, 'email': request.user.email, 'isPremium': True})
-            userProperties = UserProperties.objects.get(pk=request.user)
-            return JsonResponse({'username': request.user.username, 'email': request.user.email, 'isPremium': userProperties.isPremium})
-        except Exception:
-            return JsonResponse({'username': request.user.username, 'isAuthenticated': request.user.is_authenticated})
-
-
+    try:
+        if request.user.is_superuser:
+            return JsonResponse({'username': request.user.username, 'email': request.user.email, 'isPremium': True})
+        userProperties = UserProperties.objects.get(pk=request.user)
+        return JsonResponse(
+            {'username': request.user.username, 'email': request.user.email, 'isPremium': userProperties.isPremium})
+    except Exception:
+        return JsonResponse({'username': request.user.username, 'isAuthenticated': request.user.is_authenticated})
