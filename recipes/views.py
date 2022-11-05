@@ -1,27 +1,40 @@
 from django.http import HttpResponse, JsonResponse
 from recipes.models import Recipe
-
+from django.contrib.auth.models import User
 
 
 # Create your views here.
 # CRUD Create Read Update Write
 def create_recipe(request):
-    if request.user.is_authenticated and request.user.username != 'AnonymousUser':
-        if request.method == 'POST':
-            recipe_title = request.POST['recipe_title']
-            recipe_description = request.POST['recipe_description']
-            author = request.user
-            recipe = Recipe(recipe_title=recipe_title, recipe_description=recipe_description, author=author)
-            recipe.save()
+    if request.method == 'POST':
+        # Fields
+        recipe_title = request.POST.get('recipe_title')
+        recipe_description = request.POST.get('recipe_description')
+        author = request.POST.get('author')
+        image = request.POST.get('image')
+        ingredients = request.POST.get('ingredients')
+        procedure = request.POST.get('procedure')
 
-            return JsonResponse({
-                'id': recipe.id,
-                'authorID': recipe.author.id,
-                'pub_date': recipe.pub_date,
-                'recipe_title': recipe.recipe_title,
-                'recipe_description': recipe.recipe_description,
-                'success': True
-            })
+        try:
+            User.objects.get(username=author)
+        except User.DoesNotExist:
+            return JsonResponse({'success': False})
+
+        recipe = Recipe(recipe_title=recipe_title, recipe_description=recipe_description, author=author, image=image,
+                        ingredients=ingredients.split(','), procedure=procedure.split(','))
+        recipe.save()
+
+        return JsonResponse({
+            'id': recipe.id,
+            'authorID': recipe.author,
+            'pub_date': recipe.pub_date,
+            'recipe_title': recipe.recipe_title,
+            'recipe_description': recipe.recipe_description,
+            'image': recipe.image,
+            'ingredients': recipe.ingredients,
+            'procedure': recipe.procedure,
+            'success': True
+        })
     return JsonResponse({'success': False})
 
 
@@ -31,18 +44,22 @@ def get_recipe(request):
         r = Recipe.objects.get(pk=id)
         return JsonResponse({
             'id': r.id,
-            'authorID': r.author.id,
+            'author': r.author,
             'pub_date': r.pub_date,
             'recipe_title': r.recipe_title,
             'recipe_description': r.recipe_description,
+            'image': r.image,
+            'ingredients': r.ingredients,
+            'procedure': r.procedure,
             'success': True
         })
     return JsonResponse({'success': False})
 
+
 def update_recipe(request):
     if request.method == 'POST':
-        id = request.POST['id']
-        r = Recipe.objects.get(pk=id)
+        author = request.POST['username']
+        r = Recipe.objects.get(author=author)
 
         for k in request.POST:
             v = request.POST[k]
@@ -53,10 +70,13 @@ def update_recipe(request):
         r.save()
         return JsonResponse({
             'id': r.id,
-            'authorID': r.author.id,
+            'author': r.author,
             'pub_date': r.pub_date,
             'recipe_title': r.recipe_title,
             'recipe_description': r.recipe_description,
+            'image': r.image,
+            'ingredients': r.ingredients,
+            'procedure': r.procedure,
             'success': True
         })
 
@@ -77,16 +97,19 @@ def delete_recipe(request):
 
 def authors_recipes(request):
     if request.method == 'POST':
-        id = request.POST['id']
-        r = Recipe.objects.all().filter(author_id=id)
+        username = request.POST['username']
+        r = Recipe.objects.all().filter(author=username)
         list_of_recipes = []
         for recipe in r:
             temp_dict = {
                 'id': recipe.id,
-                'authorID': recipe.author.id,
+                'author': recipe.author,
                 'pub_date': recipe.pub_date,
                 'recipe_title': recipe.recipe_title,
                 'recipe_description': recipe.recipe_description,
+                'image': r.image,
+                'ingredients': r.ingredients,
+                'procedure': r.procedure,
                 'success': True
             }
             list_of_recipes.append(temp_dict)
@@ -104,5 +127,8 @@ def get_all_recipes(request):
             'pub_date': r.pub_date,
             'recipe_title': r.recipe_title,
             'recipe_description': r.recipe_description,
+            'image': r.image,
+            'ingredients': r.ingredients,
+            'procedure': r.procedure,
         })
     return JsonResponse({'recipes': recipes, 'success': True})

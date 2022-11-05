@@ -9,7 +9,12 @@ class Recipe(models.Model):
     recipe_title = models.TextField(max_length=100)
     recipe_description = models.TextField(max_length=250)
     pub_date = models.DateTimeField(auto_now=True, blank=True)
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.TextField()
+    image = models.TextField()
+    ingredients = models.JSONField()
+    procedure = models.JSONField()
+
+
 
     def __str__(self):
         return f'{self.author.username}: {self.recipe_title}'
