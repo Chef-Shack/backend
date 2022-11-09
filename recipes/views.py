@@ -123,7 +123,7 @@ def get_all_recipes(request):
     for r in Recipe.objects.all():
         recipes.append({
             'id': r.id,
-            'authorID': r.author.id,
+            'author': r.author,
             'pub_date': r.pub_date,
             'recipe_title': r.recipe_title,
             'recipe_description': r.recipe_description,

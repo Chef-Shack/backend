@@ -3,6 +3,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.models import User
 from members.models import UserProperties
+from recipes.models import Recipe
 
 
 # Create your views here.
@@ -35,8 +36,23 @@ def register_user(request):
         password = request.POST['password']
         email = request.POST['email']
         user = User.objects.create_user(username=username, password=password, email=email)
-        userProperties = UserProperties.objects.create(user=user, isPremium=False)
-        return JsonResponse({'user': username, 'email': email, 'isPremium': userProperties.isPremium, 'success': True})
+        userProperties = UserProperties.objects.create(user=user, isPremium=False, likedRecipes=[])
+        return JsonResponse({'user': username, 'email': email, 'isPremium': userProperties.isPremium,
+                             'likedRecipes': userProperties.likedRecipes, 'success': True})
+    else:
+        return JsonResponse({'success': False})
+
+
+@ensure_csrf_cookie
+def register_admin(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        email = request.POST['email']
+        user = User.objects.create_superuser(username=username, password=password, email=email)
+        userProperties = UserProperties.objects.create(user=user, isPremium=True, likedRecipes=[])
+        return JsonResponse({'user': username, 'email': email, 'isPremium': userProperties.isPremium,
+                             'likedRecipes': userProperties.likedRecipes, 'success': True})
     else:
         return JsonResponse({'success': False})
 
@@ -45,11 +61,9 @@ def register_user(request):
 def get_user_by_id(request, id):
     try:
         user = User.objects.get(pk=id)
-        if user.is_superuser:
-            return JsonResponse({'username': user.username, 'email': user.email, 'isPremium': True, 'success': True})
         userProperties = UserProperties.objects.get(pk=user)
         return JsonResponse({'username': user.username, 'email': user.email, 'isPremium': userProperties.isPremium,
-                             'success': True})
+                             'likedRecipes': userProperties.likedRecipes, 'success': True})
     except User.DoesNotExist:
         return JsonResponse({'success': False})
 
@@ -58,24 +72,46 @@ def get_user_by_id(request, id):
 def get_user_by_name(request, username):
     user = User.objects.all().filter(username=username).first()
     try:
-        if user.is_superuser:
-            return JsonResponse({'username': user.username, 'email': user.email, 'isPremium': True, 'success': True})
         userProperties = UserProperties.objects.get(pk=user)
         return JsonResponse({'username': user.username, 'email': user.email, 'isPremium': userProperties.isPremium,
-                             'success': True})
+                             'likedRecipes': userProperties.likedRecipes, 'success': True})
     except AttributeError:
         return JsonResponse({'success': False})
 
+
 @ensure_csrf_cookie
-def get_user_instance(request):
-    if not request.user.is_authenticated:
-        return JsonResponse({'success': False})
-    if request.user.is_superuser:
-        return JsonResponse({'username': request.user.username, 'email': request.user.email, 'isPremium': True,
-                             'success': True})
-    userProperties = UserProperties.objects.get(pk=request.user)
-    return JsonResponse(
-        {'username': request.user.username, 'email': request.user.email, 'isPremium': userProperties.isPremium,
-         'success': True})
+def like_recipe(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        recipeID = request.POST.get('recipeID')
+
+        recipe = Recipe.objects.get(pk=recipeID)
+        user = User.objects.get(username=username)
+        userProperties = UserProperties.objects.get(user=user)
+
+        if recipe.id in userProperties.likedRecipes:
+            return JsonResponse({'success': False})
+        else:
+            userProperties.likedRecipes.append(recipe.id)
+            userProperties.save()
+            return JsonResponse({'username': user.username, 'email': user.email, 'isPremium': userProperties.isPremium,
+                    'likedRecipes': userProperties.likedRecipes, 'success': True})
 
 
+@ensure_csrf_cookie
+def unlike_recipe(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        recipeID = request.POST['recipeID']
+
+        recipe = Recipe.objects.get(pk=recipeID)
+        user = User.objects.get(username=username)
+        userProperties = UserProperties.objects.get(user=user)
+
+        if recipe.id in userProperties.likedRecipes:
+            userProperties.likedRecipes.remove(recipe.id)
+            userProperties.save()
+            return JsonResponse({'username': user.username, 'email': user.email, 'isPremium': userProperties.isPremium,
+                                 'likedRecipes': userProperties.likedRecipes, 'success': True})
+        else:
+            return JsonResponse({'success': False})
