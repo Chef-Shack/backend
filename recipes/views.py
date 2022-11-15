@@ -51,6 +51,7 @@ def get_recipe(request):
             'image': r.image,
             'ingredients': r.ingredients,
             'procedure': r.procedure,
+            'likes': r.likes,
             'success': True
         })
     return JsonResponse({'success': False})
@@ -110,6 +111,7 @@ def authors_recipes(request):
                 'image': r.image,
                 'ingredients': r.ingredients,
                 'procedure': r.procedure,
+                'likes': r.likes,
                 'success': True
             }
             list_of_recipes.append(temp_dict)
@@ -130,5 +132,6 @@ def get_all_recipes(request):
             'image': r.image,
             'ingredients': r.ingredients,
             'procedure': r.procedure,
+            'likes': r.likes
         })
     return JsonResponse({'recipes': recipes, 'success': True})

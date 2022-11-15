@@ -11,6 +11,7 @@ class Recipe(models.Model):
     pub_date = models.DateTimeField(auto_now=True, blank=True)
     author = models.TextField()
     image = models.TextField()
+    likes = models.IntegerField()
     ingredients = models.JSONField()
     procedure = models.JSONField()
 

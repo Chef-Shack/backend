@@ -92,6 +92,7 @@ def like_recipe(request):
         if recipe.id in userProperties.likedRecipes:
             return JsonResponse({'success': False})
         else:
+            recipe.likes += 1
             userProperties.likedRecipes.append(recipe.id)
             userProperties.save()
             return JsonResponse({'username': user.username, 'email': user.email, 'isPremium': userProperties.isPremium,
@@ -109,6 +110,7 @@ def unlike_recipe(request):
         userProperties = UserProperties.objects.get(user=user)
 
         if recipe.id in userProperties.likedRecipes:
+            recipe.likes -= 1
             userProperties.likedRecipes.remove(recipe.id)
             userProperties.save()
             return JsonResponse({'username': user.username, 'email': user.email, 'isPremium': userProperties.isPremium,
