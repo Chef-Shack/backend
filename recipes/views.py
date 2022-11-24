@@ -21,7 +21,7 @@ def create_recipe(request):
             return JsonResponse({'success': False})
 
         recipe = Recipe(recipe_title=recipe_title, recipe_description=recipe_description, author=author, image=image,
-                        ingredients=ingredients.split(','), procedure=procedure.split(','))
+                        ingredients=ingredients.split(','), procedure=procedure.split(','), likes=0)
         recipe.save()
 
         return JsonResponse({
@@ -33,6 +33,7 @@ def create_recipe(request):
             'image': recipe.image,
             'ingredients': recipe.ingredients,
             'procedure': recipe.procedure,
+            'likes': recipe.likes,
             'success': True
         })
     return JsonResponse({'success': False})
@@ -78,6 +79,7 @@ def update_recipe(request):
             'image': r.image,
             'ingredients': r.ingredients,
             'procedure': r.procedure,
+            'likes': r.likes,
             'success': True
         })
 

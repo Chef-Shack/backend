@@ -15,7 +15,5 @@ class Recipe(models.Model):
     ingredients = models.JSONField()
     procedure = models.JSONField()
 
-
-
     def __str__(self):
         return f'{self.author.username}: {self.recipe_title}'
