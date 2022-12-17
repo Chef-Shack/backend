@@ -10,6 +10,7 @@ class Recipe(models.Model):
     recipe_description = models.TextField(max_length=250)
     pub_date = models.DateTimeField(auto_now=True, blank=True)
     author = models.TextField()
+    category = models.TextField()
     image = models.TextField()
     likes = models.IntegerField()
     ingredients = models.JSONField()

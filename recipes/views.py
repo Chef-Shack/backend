@@ -14,6 +14,7 @@ def create_recipe(request):
         image = request.POST.get('image')
         ingredients = request.POST.get('ingredients')
         procedure = request.POST.get('procedure')
+        category = request.POST.get('category')
 
         try:
             User.objects.get(username=author)
@@ -21,7 +22,7 @@ def create_recipe(request):
             return JsonResponse({'success': False})
 
         recipe = Recipe(recipe_title=recipe_title, recipe_description=recipe_description, author=author, image=image,
-                        ingredients=ingredients.split(','), procedure=procedure.split(','), likes=0)
+                        ingredients=ingredients.split(','), procedure=procedure.split(','), category=category, likes=0)
         recipe.save()
 
         return JsonResponse({
@@ -52,6 +53,7 @@ def get_recipe(request):
             'image': r.image,
             'ingredients': r.ingredients,
             'procedure': r.procedure,
+            'category': r.category,
             'likes': r.likes,
             'success': True
         })
@@ -79,6 +81,7 @@ def update_recipe(request):
             'image': r.image,
             'ingredients': r.ingredients,
             'procedure': r.procedure,
+            'category': r.category,
             'likes': r.likes,
             'success': True
         })
@@ -113,6 +116,7 @@ def authors_recipes(request):
                 'image': r.image,
                 'ingredients': r.ingredients,
                 'procedure': r.procedure,
+                'category': r.category,
                 'likes': r.likes,
                 'success': True
             }
@@ -134,6 +138,7 @@ def get_all_recipes(request):
             'image': r.image,
             'ingredients': r.ingredients,
             'procedure': r.procedure,
+            'category': r.category,
             'likes': r.likes
         })
     return JsonResponse({'recipes': recipes, 'success': True})
