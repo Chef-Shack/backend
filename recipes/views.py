@@ -125,6 +125,31 @@ def authors_recipes(request):
     return JsonResponse({'success': False})
 
 
+def category_recipes(request):
+    if request.method == 'POST':
+        category = request.POST['category']
+        r = Recipe.objects.all().filter(category=category)
+        list_of_categories = []
+        for recipe in r:
+            temp_dict = {
+                'id': recipe.id,
+                'author': recipe.author,
+                'pub_date': recipe.pub_date,
+                'recipe_title': recipe.recipe_title,
+                'recipe_description': recipe.recipe_description,
+                'image': r.image,
+                'ingredients': r.ingredients,
+                'procedure': r.procedure,
+                'category': r.category,
+                'likes': r.likes,
+                'success': True
+            }
+            list_of_categories.append(temp_dict)
+        return JsonResponse(list_of_categories, safe=False)
+    else:
+        return JsonResponse({'success': False})
+
+
 def get_all_recipes(request):
     global data
     recipes = []
