@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -21,11 +25,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-(++i%k7#_i97i00(-u*5sdeofc#9n+i_z!cwkdr5e21vy8r96o'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# PUT DOMAIN HERE
 ALLOWED_HOSTS = []
 
 
@@ -96,8 +101,8 @@ DATABASES = {
         'NAME': 'ChefShackDB',
         "CLIENT": {
             'host': 'mongodb+srv://SecureUser:SecurePass@cluster0.bgh9s95.mongodb.net/?retryWrites=true&w=majority',
-            'username': 'SecureUser',
-            'password': 'SecurePass'
+            'username': os.getenv('DB_USER'),
+            'password': os.getenv('DB_PASS')
         }
     }
 }

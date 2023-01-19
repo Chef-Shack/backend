@@ -17,7 +17,7 @@ def create_recipe(request):
         category = request.POST.get('category')
 
         try:
-            User.objects.get(username=author)
+            User.objects.get(pk=author)
         except User.DoesNotExist:
             return JsonResponse({'success': False})
 
@@ -44,9 +44,11 @@ def get_recipe(request):
     if request.method == 'POST':
         id = request.POST['id']
         r = Recipe.objects.get(pk=id)
+        authorUsername = User.objects.get(pk=r.author).username
         return JsonResponse({
             'id': r.id,
             'author': r.author,
+            'username': authorUsername,
             'pub_date': r.pub_date,
             'recipe_title': r.recipe_title,
             'recipe_description': r.recipe_description,
@@ -154,9 +156,11 @@ def get_all_recipes(request):
     global data
     recipes = []
     for r in Recipe.objects.all():
+        authorUsername = User.objects.get(pk=r.author).username
         recipes.append({
             'id': r.id,
             'author': r.author,
+            'username': authorUsername,
             'pub_date': r.pub_date,
             'recipe_title': r.recipe_title,
             'recipe_description': r.recipe_description,
